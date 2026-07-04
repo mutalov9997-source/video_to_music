@@ -291,4 +291,3 @@ async def video_handler(message: Message):
         except:
             pass
         await wait_msg.delete()
-          
