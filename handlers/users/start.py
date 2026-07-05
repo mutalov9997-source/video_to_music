@@ -28,6 +28,23 @@ premium_users: set[int] = set()
 single_credits: dict[int, int] = {}
 
 
+# ===== USER STORAGE =====
+def save_user(user_id: int):
+    with open("users.txt", "a+") as f:
+        f.seek(0)
+        ids = f.read().splitlines()
+        if str(user_id) not in ids:
+            f.write(f"{user_id}\n")
+
+
+def get_all_users() -> list[int]:
+    try:
+        with open("users.txt", "r") as f:
+            return [int(i) for i in f.read().splitlines() if i]
+    except FileNotFoundError:
+        return []
+
+
 async def check_subscription(user_id: int) -> bool:
     try:
         member = await bot.get_chat_member(CHANNEL_USERNAME, user_id)
@@ -64,6 +81,8 @@ def donate_keyboard() -> InlineKeyboardMarkup:
 
 @dp.message(CommandStart())
 async def start_handler(message: Message):
+    save_user(message.from_user.id)
+
     is_subscribed = await check_subscription(message.from_user.id)
     if not is_subscribed:
         await message.answer(
