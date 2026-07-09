@@ -258,7 +258,11 @@ async def video_handler(message: Message):
     file_size = message.video.file_size
     is_large = file_size > 20 * 1024 * 1024
 
-    if is_large:
+    # ✅ Admin uchun bepul
+    from data.config import ADMINS
+    is_admin = str(user_id) in ADMINS
+
+    if is_large and not is_admin:
         is_premium = user_id in premium_users
         has_credit = single_credits.get(user_id, 0) > 0
 
@@ -288,9 +292,9 @@ async def video_handler(message: Message):
             file_name=video_path
         )
     else:
-        # Oddiy bot API bilan
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, video_path)
+
     audio_path = None
     try:
         audio_path, video_size, audio_size = convert_video_to_audio(video_path)
