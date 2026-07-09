@@ -288,12 +288,9 @@ async def video_handler(message: Message):
         await wait_msg.edit_text("⏳ Downloading large file...")
         await pyro.connect()
         msg = await pyro.get_messages(message.chat.id, ids=message.message_id)
-        await pyro.download_media(msg, file=video_path)
-        # Telethon fayl nomiga .mp4 qo'shadi — tekshiramiz
-        if not os.path.exists(video_path):
-            video_path_check = video_path + ".mp4"
-            if os.path.exists(video_path_check):
-                os.rename(video_path_check, video_path)
+        downloaded = await pyro.download_media(msg, file=video_path)
+        # downloaded — haqiqiy fayl yo'li
+        video_path = downloaded  # haqiqiy yo'lni ishlatamiz
 
     audio_path = None
     try:
