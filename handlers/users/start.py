@@ -285,13 +285,16 @@ async def video_handler(message: Message):
     video_path = os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4().hex}.mp4")
 
     if is_large:
-        await wait_msg.edit_text("⏳ Downloading large file...")
-        await pyro.connect()
-        downloaded = await pyro.download_file(
-            message.video.file_id,
-            file=DOWNLOAD_DIR + "/"
+        await wait_msg.delete()
+        await message.answer(
+            f"⚠️ Your video is <b>{file_size / 1024 / 1024:.1f} MB</b>\n\n"
+            "🔜 Large video support is coming soon!\n\n"
+            "Please compress your video to under 20 MB and try again."
         )
-        video_path = downloaded
+        return
+    else:
+        file = await bot.get_file(file_id)
+        await bot.download_file(file.file_path, video_path)
 
     audio_path = None
     try:
