@@ -11,14 +11,14 @@ logger = logging.getLogger(__name__)
 from loader import pyro
 
 async def main():
-    await pyro.start()
+    await pyro.connect()
     await set_commands()
     await notify_bot_admins()
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     finally:
-        await pyro.stop()
+        await pyro.disconnect()
         await storage.close()
         await bot.session.close()
 

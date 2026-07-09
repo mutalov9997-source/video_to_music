@@ -1,12 +1,12 @@
 import os
 import uuid
 import asyncio
-
+from loader import bot, dp, pyro
 from aiogram import F
 from aiogram.filters import CommandStart
 from aiogram.types import (
     Message, FSInputFile, CallbackQuery,
-    InlineKeyboardButton, InlineKeyboardMarkup,
+    InlineKeyboardButton, InlineKeyboardMarkup, 
     LabeledPrice, PreCheckoutQuery
 )
 from aiogram.exceptions import TelegramBadRequest
@@ -285,13 +285,10 @@ async def video_handler(message: Message):
     video_path = os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4().hex}.mp4")
 
     if is_large:
-        from loader import pyro
         await wait_msg.edit_text("⏳ Downloading large file...")
-        # file_id emas, message_id orqali yuklab olish
-        chat_id = message.chat.id
-        message_id = message.message_id
-        pyro_message = await pyro.get_messages(chat_id, message_id)
-        await pyro_message.download(file_name=video_path)
+        await pyro.connect()
+        msg = await pyro.get_messages(message.chat.id, ids=message.message_id)
+        await pyro.download_media(msg, file=video_path)
     else:
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, video_path)
