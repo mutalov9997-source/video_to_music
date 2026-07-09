@@ -6,7 +6,7 @@ from aiogram import F
 from aiogram.filters import CommandStart
 from aiogram.types import (
     Message, FSInputFile, CallbackQuery,
-    InlineKeyboardButton, InlineKeyboardMarkup, 
+    InlineKeyboardButton, InlineKeyboardMarkup,
     LabeledPrice, PreCheckoutQuery
 )
 from aiogram.exceptions import TelegramBadRequest
@@ -289,9 +289,11 @@ async def video_handler(message: Message):
         await pyro.connect()
         msg = await pyro.get_messages(message.chat.id, ids=message.message_id)
         await pyro.download_media(msg, file=video_path)
-    else:
-        file = await bot.get_file(file_id)
-        await bot.download_file(file.file_path, video_path)
+        # Telethon fayl nomiga .mp4 qo'shadi — tekshiramiz
+        if not os.path.exists(video_path):
+            video_path_check = video_path + ".mp4"
+            if os.path.exists(video_path_check):
+                os.rename(video_path_check, video_path)
 
     audio_path = None
     try:
