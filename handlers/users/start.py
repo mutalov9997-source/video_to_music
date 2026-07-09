@@ -278,10 +278,19 @@ async def video_handler(message: Message):
     wait_msg = await message.answer("⏳")
 
     file_id = message.video.file_id
-    file = await bot.get_file(file_id)
     video_path = os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4().hex}.mp4")
-    await bot.download_file(file.file_path, video_path)
 
+    if is_large:
+        from loader import pyro
+        await wait_msg.edit_text("⏳ Downloading large file...")
+        await pyro.download_media(
+            message.video.file_id,
+            file_name=video_path
+        )
+    else:
+        # Oddiy bot API bilan
+        file = await bot.get_file(file_id)
+        await bot.download_file(file.file_path, video_path)
     audio_path = None
     try:
         audio_path, video_size, audio_size = convert_video_to_audio(video_path)
