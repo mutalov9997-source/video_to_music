@@ -287,10 +287,11 @@ async def video_handler(message: Message):
     if is_large:
         from loader import pyro
         await wait_msg.edit_text("⏳ Downloading large file...")
-        await pyro.download_media(
-            message.video.file_id,
-            file_name=video_path
-        )
+        # file_id emas, message_id orqali yuklab olish
+        chat_id = message.chat.id
+        message_id = message.message_id
+        pyro_message = await pyro.get_messages(chat_id, message_id)
+        await pyro_message.download(file_name=video_path)
     else:
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, video_path)
