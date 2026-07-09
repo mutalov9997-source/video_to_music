@@ -1,1 +1,1 @@
-from .config import BOT_TOKEN, ADMINS, USE_REDIS, REDIS_HOST
+from .config import BOT_TOKEN, ADMINS, USE_REDIS, REDIS_HOST, API_ID, API_HASH
