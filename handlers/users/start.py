@@ -287,23 +287,31 @@ async def video_handler(message: Message):
     if is_large:
         await wait_msg.edit_text("⏳ Downloading large file...")
         try:
-            from telethon.tl.types import InputDocumentFileLocation
-            from telethon.tl.functions.upload import GetFileRequest
+            # chat_id ni to'g'ri formatga o'girish
+            peer = await pyro.get_input_entity(message.chat.id)
 
-            # Bot API file ni oladi
-            tg_file = await bot.get_file(message.video.file_id)
-            file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{tg_file.file_path}"
+            forwarded = await pyro.forward_messages(
+                entity="me",
+                messages=[message.message_id],
+                from_peer=peer
+            )
 
-            # URL dan yuklab olish
-            import aiohttp
-            async with aiohttp.ClientSession() as session:
-                async with session.get(file_url) as resp:
-                    with open(video_path, 'wb') as f:
-                        while True:
-                            chunk = await resp.content.read(1024 * 1024)
-                            if not chunk:
-                                break
-                            f.write(chunk)
+            if isinstance(forwarded, list):
+                forwarded = forwarded[0]
+
+            downloaded = await pyro.download_media(
+                forwarded,
+                file=os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4().hex}.mp4")
+            )
+
+            if not downloaded or not os.path.exists(downloaded):
+                await wait_msg.delete()
+                await message.answer("❌ Download failed!")
+                return
+
+            video_path = downloaded
+            await pyro.delete_messages("me", forwarded.id)
+
         except Exception as e:
             import traceback
             err = traceback.format_exc()
