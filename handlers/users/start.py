@@ -285,13 +285,22 @@ async def video_handler(message: Message):
     video_path = os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4().hex}.mp4")
 
     if is_large:
-        await wait_msg.delete()
-        await message.answer(
-            f"⚠️ Your video is <b>{file_size / 1024 / 1024:.1f} MB</b>\n\n"
-            "🔜 Large video support is coming soon!\n\n"
-            "Please compress your video to under 20 MB and try again."
-        )
-        return
+        await wait_msg.edit_text("⏳ Downloading large file...")
+        try:
+            # Foydalanuvchi chatiga forward qilib yuklab olish
+            forwarded = await pyro.forward_messages(
+                entity="me",
+                messages=message.message_id,
+                from_peer=message.chat.id
+            )
+            downloaded = await pyro.download_media(forwarded, file=DOWNLOAD_DIR + "/")
+            video_path = downloaded
+            # Forward qilingan xabarni o'chiramiz
+            await pyro.delete_messages("me", forwarded.id)
+        except Exception as e:
+            await wait_msg.delete()
+            await message.answer(f"❌ Error downloading large file: {e}")
+            return
     else:
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, video_path)
