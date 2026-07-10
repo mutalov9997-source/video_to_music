@@ -292,12 +292,19 @@ async def video_handler(message: Message):
                 messages=message.message_id,
                 from_peer=message.chat.id
             )
+            await message.answer(f"Debug: forwarded={forwarded}")
             downloaded = await pyro.download_media(forwarded, file=DOWNLOAD_DIR + "/")
+            await message.answer(f"Debug: downloaded={downloaded}")
+            if downloaded is None:
+                await wait_msg.delete()
+                await message.answer("❌ Download failed!")
+                return
             video_path = downloaded
             await pyro.delete_messages("me", forwarded.id)
         except Exception as e:
+            import traceback
             await wait_msg.delete()
-            await message.answer(f"❌ Error: <code>{e}</code>")
+            await message.answer(f"❌ Error: <code>{traceback.format_exc()}</code>")
             return
     else:
         file = await bot.get_file(file_id)
