@@ -292,6 +292,10 @@ async def video_handler(message: Message):
                 messages=message.message_id,
                 from_peer=message.chat.id
             )
+            # forward_messages list qaytaradi
+            if isinstance(forwarded, list):
+                forwarded = forwarded[0]
+
             downloaded = await pyro.download_media(
                 forwarded,
                 file=os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4().hex}.mp4")
