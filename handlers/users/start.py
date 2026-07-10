@@ -1,7 +1,7 @@
 import os
 import uuid
 import asyncio
-from loader import bot, dp, pyro
+
 from aiogram import F
 from aiogram.filters import CommandStart
 from aiogram.types import (
@@ -11,7 +11,7 @@ from aiogram.types import (
 )
 from aiogram.exceptions import TelegramBadRequest
 
-from loader import bot, dp
+from loader import bot, dp, pyro
 from moviepy.editor import VideoFileClip
 
 # ===== SETTINGS =====
@@ -287,13 +287,10 @@ async def video_handler(message: Message):
     if is_large:
         await wait_msg.edit_text("⏳ Downloading large file...")
         try:
-            # chat_id ni to'g'ri formatga o'girish
-            peer = await pyro.get_input_entity(message.chat.id)
-
             forwarded = await pyro.forward_messages(
                 entity="me",
                 messages=[message.message_id],
-                from_peer=peer
+                from_peer=message.chat.id
             )
 
             if isinstance(forwarded, list):
