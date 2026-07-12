@@ -10,7 +10,7 @@ from aiogram.types import (
     LabeledPrice, PreCheckoutQuery
 )
 from aiogram.exceptions import TelegramBadRequest
-
+''
 from loader import bot, dp, pyro
 from moviepy.editor import VideoFileClip
 
