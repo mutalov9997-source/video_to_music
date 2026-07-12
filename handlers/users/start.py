@@ -50,7 +50,7 @@ async def check_subscription(user_id: int) -> bool:
         member = await bot.get_chat_member(CHANNEL_USERNAME, user_id)
         return member.status in ["member", "administrator", "creator"]
     except TelegramBadRequest:
-        return False
+        return True
 
 
 def sub_keyboard() -> InlineKeyboardMarkup:
